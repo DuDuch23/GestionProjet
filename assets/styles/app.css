@@ -1,3 +1,24 @@
-body {
-    background-color: skyblue;
+@import "tailwindcss";
+
+/*
+ * Design tokens. Tailwind's gray scale is the base palette; only the font
+ * stack is customised. Keep utility classes in templates/components first,
+ * add CSS here only when a utility can't express it.
+ */
+@theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+    html {
+        @apply bg-gray-50 text-gray-900 antialiased;
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-gray-800;
+    }
+
+    ::selection {
+        @apply bg-gray-900 text-white;
+    }
 }

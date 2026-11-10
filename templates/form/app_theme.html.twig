@@ -1,0 +1,110 @@
+{#
+    Project form theme (registered globally in config/packages/twig.yaml).
+    Builds on Symfony's Tailwind layout, which exposes widget_class /
+    widget_errors_class / widget_disabled_class, and applies the design-system classes.
+#}
+{% use 'tailwind_2_layout.html.twig' %}
+
+{%- block form_row -%}
+    {%- set row_class = row_class|default('mb-5 flex flex-col gap-1.5') -%}
+    {{- parent() -}}
+{%- endblock form_row -%}
+
+{%- block widget_attributes -%}
+    {%- set widget_class = widget_class|default(
+        'w-full rounded-lg border px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-800'
+        ~ (errors|length or disabled ? '' : ' border-gray-300 bg-white')
+        ~ (extra_widget_class is defined ? ' ' ~ extra_widget_class : '')
+    ) -%}
+    {%- set widget_disabled_class = widget_disabled_class|default('border-gray-200 bg-gray-50 text-gray-500') -%}
+    {%- set widget_errors_class = widget_errors_class|default('border-red-500 bg-white') -%}
+    {%- if errors|length -%}
+        {%- set attr = attr|merge({'aria-invalid': 'true'}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock widget_attributes -%}
+
+{%- block textarea_widget -%}
+    {%- set extra_widget_class = 'resize-none' -%}
+    {%- set attr = attr|merge({rows: attr.rows|default(5)}) -%}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{%- block checkbox_widget -%}
+    {%- set widget_class = 'mr-2 size-4 rounded border-gray-300 accent-gray-900' -%}
+    {{- parent() -}}
+{%- endblock checkbox_widget -%}
+
+{%- block radio_widget -%}
+    {%- set widget_class = 'mr-2 size-4 border-gray-300 accent-gray-900' -%}
+    {{- parent() -}}
+{%- endblock radio_widget -%}
+
+{%- block form_label -%}
+    {%- set label_class = label_class|default('text-sm font-medium text-gray-700') -%}
+    {{- parent() -}}
+{%- endblock form_label -%}
+
+{%- block form_label_content -%}
+    {{- parent() -}}
+    {#- also used by button labels, which have no "required" variable -#}
+    {%- if required|default(false) %}<span class="ml-0.5 text-red-600" aria-hidden="true">*</span>{% endif -%}
+{%- endblock form_label_content -%}
+
+{%- block form_help -%}
+    {%- set help_class = help_class|default('text-xs text-gray-500') -%}
+    {{- parent() -}}
+{%- endblock form_help -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        {%- if compound -%}
+            {# Form-level errors: shown at the top of the form #}
+            <div class="mb-5 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
+                <ul class="list-inside list-disc">
+                    {%- for error in errors %}<li>{{ error.message }}</li>{% endfor -%}
+                </ul>
+            </div>
+        {%- else -%}
+            {# Field errors: "order-last" puts them under the input in the flex row #}
+            <ul class="order-last">
+                {%- for error in errors -%}
+                    <li class="text-sm text-red-600" id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</li>
+                {%- endfor -%}
+            </ul>
+        {%- endif -%}
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block choice_widget_expanded -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form %}
+            <div class="flex items-center">
+                {{- form_widget(child) -}}
+                {{- form_label(child, null, {translation_domain: choice_translation_domain, label_class: 'text-sm text-gray-700'}) -}}
+            </div>
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block checkbox_row -%}
+    {%- set row_attr = row_attr|merge({class: row_attr.class|default(row_class|default('mb-5'))}) -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        <div class="inline-flex items-center">
+            {{- form_widget(form, help ? {attr: {'aria-describedby': id ~ '_help'}} : {}) -}}
+            {{- form_label(form, null, {label_class: 'text-sm text-gray-700'}) -}}
+        </div>
+        {{- form_errors(form) -}}
+        {{- form_help(form) -}}
+    </div>
+{%- endblock checkbox_row -%}
+
+{%- block button_widget -%}
+    {%- set attr = attr|merge({class: attr.class|default('inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:border-gray-900 hover:text-gray-900 disabled:opacity-50')}) -%}
+    {{- parent() -}}
+{%- endblock button_widget -%}
+
+{%- block submit_widget -%}
+    {%- set attr = attr|merge({class: attr.class|default('inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700 disabled:opacity-50')}) -%}
+    {{- parent() -}}
+{%- endblock submit_widget -%}

@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Styleguide · GestionProjet{% endblock %}
+
+{% macro section(title, code) %}
+    <div class="mb-3 flex items-baseline justify-between gap-4">
+        <h2 class="text-lg font-semibold text-gray-900">{{ title }}</h2>
+        <code class="hidden truncate rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 sm:block">{{ code }}</code>
+    </div>
+{% endmacro %}
+
+{% block body %}
+    {% import _self as ui %}
+
+    <twig:PageHeader title="Styleguide" subtitle="Composants Twig du projet (templates/components). Page visible en dev uniquement." />
+
+    <div class="flex flex-col gap-10">
+        <section>
+            {{ ui.section('Button', '<twig:Button variant="secondary" size="sm" icon="lucide:plus">') }}
+            <twig:Card>
+                <div class="flex flex-wrap items-center gap-3">
+                    <twig:Button>Primaire</twig:Button>
+                    <twig:Button variant="secondary">Secondaire</twig:Button>
+                    <twig:Button variant="danger" icon="lucide:trash-2">Supprimer</twig:Button>
+                    <twig:Button variant="ghost">Ghost</twig:Button>
+                    <twig:Button disabled>Enregistrement…</twig:Button>
+                </div>
+                <div class="mt-4 flex flex-wrap items-center gap-3">
+                    <twig:Button size="sm" icon="lucide:plus">Petit</twig:Button>
+                    <twig:Button size="sm" variant="secondary" icon="lucide:funnel">Filtrer</twig:Button>
+                    <twig:Button size="sm" variant="ghost" icon="lucide:arrow-right" iconPosition="end">Lien</twig:Button>
+                </div>
+            </twig:Card>
+        </section>
+
+        <section>
+            {{ ui.section('Badge · PriorityBadge · StatusBadge', '<twig:PriorityBadge :priority="project.priority" />') }}
+            <twig:Card>
+                <div class="flex flex-wrap items-center gap-2">
+                    {% for color in ['gray', 'blue', 'green', 'amber', 'orange', 'red', 'purple'] %}
+                        <twig:Badge :color="color">{{ color }}</twig:Badge>
+                    {% endfor %}
+                </div>
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                    {% for priority in priorities %}<twig:PriorityBadge :priority="priority" />{% endfor %}
+                </div>
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                    {% for status in statuses %}<twig:StatusBadge :status="status" />{% endfor %}
+                </div>
+            </twig:Card>
+        </section>
+
+        <section>
+            {{ ui.section('Alert', '<twig:Alert type="error">…</twig:Alert>') }}
+            <div class="flex flex-col gap-3">
+                <twig:Alert type="error">Le nom du projet est obligatoire.</twig:Alert>
+                <twig:Alert type="success" title="Sauvegardé ✓">Le projet a été mis à jour.</twig:Alert>
+                <twig:Alert type="warning">Ce projet a dépassé son échéance.</twig:Alert>
+                <twig:Alert>3 fichiers sont en attente de validation.</twig:Alert>
+            </div>
+        </section>
+
+        <section>
+            {{ ui.section('Card', '<twig:Card title="…" href="…">') }}
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <twig:Card title="Avec titre">
+                    <twig:block name="actions"><twig:Button size="sm" variant="ghost" icon="lucide:pencil">Modifier</twig:Button></twig:block>
+                    <p class="text-sm text-gray-700">Contenu de la carte.</p>
+                </twig:Card>
+                <twig:Card>
+                    <p class="text-sm text-gray-700">Carte simple, sans titre.</p>
+                </twig:Card>
+                <twig:Card href="#">
+                    <p class="text-sm font-medium text-gray-900">Carte cliquable</p>
+                    <p class="text-sm text-gray-500">Bordure et ombre au survol.</p>
+                </twig:Card>
+            </div>
+        </section>
+
+        <section>
+            {{ ui.section('EmptyState', '<twig:EmptyState message="…" />') }}
+            <twig:EmptyState message="Aucun projet publié pour l'instant.">
+                <twig:Button size="sm" icon="lucide:plus">Créer un projet</twig:Button>
+            </twig:EmptyState>
+        </section>
+
+        <section>
+            {{ ui.section('Formulaire', 'form/app_theme.html.twig (thème global)') }}
+            <twig:Card class="max-w-xl">
+                {{ form_start(form) }}
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.email) }}
+                    <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                        {{ form_row(form.priority) }}
+                        {{ form_row(form.dueDate) }}
+                    </div>
+                    {{ form_row(form.status) }}
+                    {{ form_row(form.description) }}
+                    {{ form_row(form.notify) }}
+                    <div class="flex items-center gap-3">
+                        {{ form_widget(form.save) }}
+                        <twig:Button variant="secondary" href="{{ path('home') }}">Annuler</twig:Button>
+                    </div>
+                {{ form_end(form) }}
+            </twig:Card>
+        </section>
+    </div>
+{% endblock %}

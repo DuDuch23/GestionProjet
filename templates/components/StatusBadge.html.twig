@@ -1,0 +1,13 @@
+{#
+    <twig:StatusBadge :status="project.status" />
+#}
+{% props status %}
+
+{% set colors = {
+    todo: 'gray',
+    in_progress: 'blue',
+    on_hold: 'amber',
+    done: 'green',
+} %}
+
+<twig:Badge :color="colors[status.value] ?? 'gray'" {{ ...attributes }}>{{ status.label() }}</twig:Badge>

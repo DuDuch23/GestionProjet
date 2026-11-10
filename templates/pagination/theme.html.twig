@@ -1,0 +1,66 @@
+{#
+    Pagination theme (config/packages/ux_pagination.yaml), matching the design system.
+    Lives in templates/ so Tailwind sees its classes. Usage: {{ ux_pagination(items) }}
+
+    Context provided by symfony/ux-pagination: pagination, attributes,
+    navigation_attributes, link_attributes, show_info, numbered.
+#}
+{% set link_class = 'inline-flex min-w-9 items-center justify-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:border-gray-900 hover:text-gray-900' %}
+{% set disabled_class = 'inline-flex min-w-9 items-center justify-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-300' %}
+{% set current_class = 'inline-flex min-w-9 items-center justify-center rounded-lg bg-gray-900 px-3 py-1.5 text-sm font-medium text-white' %}
+
+{% if pagination.hasPrevious() or pagination.hasNext() %}
+    <nav aria-label="{{ 'Pagination'|trans({}, 'UXPaginationBundle') }}"
+         class="{{ ('mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between ' ~ attributes.class|default(''))|trim }}">
+        {% if show_info %}
+            <p class="text-sm text-gray-500">{{ pagination.info }}</p>
+        {% endif %}
+
+        <ul class="flex flex-wrap items-center gap-1">
+            <li>
+                {% if pagination.hasPrevious() %}
+                    <a href="{{ pagination.previousUrl }}" rel="prev" class="{{ link_class }}"
+                       aria-label="{{ 'Previous page'|trans({}, 'UXPaginationBundle') }}">
+                        {{ ux_icon('lucide:chevron-left', {class: 'size-4', 'aria-hidden': 'true'}) }}
+                        <span class="hidden sm:inline">{{ 'Previous'|trans({}, 'UXPaginationBundle') }}</span>
+                    </a>
+                {% else %}
+                    <span class="{{ disabled_class }}" aria-hidden="true">
+                        {{ ux_icon('lucide:chevron-left', {class: 'size-4'}) }}
+                        <span class="hidden sm:inline">{{ 'Previous'|trans({}, 'UXPaginationBundle') }}</span>
+                    </span>
+                {% endif %}
+            </li>
+
+            {% if numbered %}
+                {% for link in pagination.pages %}
+                    <li>
+                        {% if link.isGap %}
+                            <span class="px-1 text-sm text-gray-400" aria-hidden="true">&hellip;</span>
+                        {% elseif link.isCurrent %}
+                            <span class="{{ current_class }}" aria-current="page">{{ link.page }}</span>
+                        {% else %}
+                            <a href="{{ link.url }}" class="{{ link_class }}"
+                               aria-label="{{ 'Go to page %page%'|trans({'%page%': link.page}, 'UXPaginationBundle') }}">{{ link.page }}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            {% endif %}
+
+            <li>
+                {% if pagination.hasNext() %}
+                    <a href="{{ pagination.nextUrl }}" rel="next" class="{{ link_class }}"
+                       aria-label="{{ 'Next page'|trans({}, 'UXPaginationBundle') }}">
+                        <span class="hidden sm:inline">{{ 'Next'|trans({}, 'UXPaginationBundle') }}</span>
+                        {{ ux_icon('lucide:chevron-right', {class: 'size-4', 'aria-hidden': 'true'}) }}
+                    </a>
+                {% else %}
+                    <span class="{{ disabled_class }}" aria-hidden="true">
+                        <span class="hidden sm:inline">{{ 'Next'|trans({}, 'UXPaginationBundle') }}</span>
+                        {{ ux_icon('lucide:chevron-right', {class: 'size-4'}) }}
+                    </span>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+{% endif %}

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil · GestionProjet{% endblock %}
+
+{% block body %}
+    <twig:PageHeader title="Bienvenue sur GestionProjet" subtitle="Suivez vos projets, vos clients et l'historique de chaque action.">
+        <twig:block name="actions">
+            <twig:Button href="{{ path('project') }}" icon="lucide:arrow-right" iconPosition="end">Voir les projets</twig:Button>
+        </twig:block>
+    </twig:PageHeader>
+
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <twig:Card href="{{ path('project') }}">
+            <span class="mb-3 grid size-10 place-items-center rounded-lg bg-gray-100 text-gray-700">
+                {{ ux_icon('lucide:folder-kanban', {class: 'size-5', 'aria-hidden': 'true'}) }}
+            </span>
+            <h2 class="text-lg font-semibold text-gray-900">Projets</h2>
+            <p class="mt-1 text-sm text-gray-500">Priorités, statuts, échéances et fichiers de chaque projet.</p>
+        </twig:Card>
+        <twig:Card href="{{ path('client') }}">
+            <span class="mb-3 grid size-10 place-items-center rounded-lg bg-gray-100 text-gray-700">
+                {{ ux_icon('lucide:user', {class: 'size-5', 'aria-hidden': 'true'}) }}
+            </span>
+            <h2 class="text-lg font-semibold text-gray-900">Clients</h2>
+            <p class="mt-1 text-sm text-gray-500">Informations, historique et communications avec chaque client.</p>
+        </twig:Card>
+    </div>
+{% endblock %}

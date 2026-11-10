@@ -1,0 +1,25 @@
+{#
+    Inline message. Stays visible (no auto-dismiss).
+
+    <twig:Alert type="error">Le nom est obligatoire.</twig:Alert>
+    <twig:Alert type="success" title="Sauvegardé ✓">Le projet a été mis à jour.</twig:Alert>
+
+    type: error | success | warning | info
+#}
+{% props type = 'info', title = null %}
+
+{% set styles = {
+    error: {box: 'bg-red-50 text-red-600', icon: 'lucide:circle-alert'},
+    success: {box: 'bg-green-50 text-green-700', icon: 'lucide:circle-check'},
+    warning: {box: 'bg-amber-50 text-amber-800', icon: 'lucide:triangle-alert'},
+    info: {box: 'bg-gray-100 text-gray-700', icon: 'lucide:info'},
+} %}
+{% set style = styles[type] ?? styles.info %}
+
+<div role="{{ type == 'error' ? 'alert' : 'status' }}" {{ attributes.defaults({class: 'flex gap-2 rounded-lg px-3 py-2 text-sm ' ~ style.box}) }}>
+    {{ ux_icon(style.icon, {class: 'mt-0.5 size-4 shrink-0', 'aria-hidden': 'true'}) }}
+    <div>
+        {% if title %}<p class="font-medium">{{ title }}</p>{% endif %}
+        <div>{% block content %}{% endblock %}</div>
+    </div>
+</div>

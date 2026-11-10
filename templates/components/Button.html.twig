@@ -1,0 +1,37 @@
+{#
+    Button / link styled as a button.
+
+    <twig:Button>Enregistrer</twig:Button>
+    <twig:Button variant="secondary" size="sm" icon="lucide:funnel">Filtrer</twig:Button>
+    <twig:Button href="{{ path('project') }}" icon="lucide:arrow-right" iconPosition="end">Voir</twig:Button>
+    <twig:Button type="submit" loadingLabel="Enregistrement…">Enregistrer</twig:Button>
+
+    variant: primary | secondary | danger | ghost
+    size:    sm | md
+    loadingLabel: text shown while Turbo submits the form (button is disabled meanwhile)
+#}
+{% props variant = 'primary', size = 'md', href = null, type = 'button', icon = null, iconPosition = 'start', loadingLabel = null %}
+
+{% set variants = {
+    primary: 'bg-gray-900 text-white hover:bg-gray-700',
+    secondary: 'border border-gray-300 bg-white text-gray-700 hover:border-gray-900 hover:text-gray-900',
+    danger: 'border border-gray-300 bg-white text-gray-700 hover:border-red-500 hover:text-red-600',
+    ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+} %}
+{% set sizes = {
+    sm: 'gap-1.5 px-3 py-1.5 text-xs',
+    md: 'gap-2 px-5 py-2 text-sm',
+} %}
+{% set classes = 'inline-flex shrink-0 items-center justify-center rounded-lg font-medium whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50 '
+    ~ (variants[variant] ?? variants.primary) ~ ' ' ~ (sizes[size] ?? sizes.md) %}
+{% set iconClass = size == 'sm' ? 'size-3.5' : 'size-4' %}
+
+{% if href %}
+<a href="{{ href }}" {{ attributes.defaults({class: classes}) }}>
+{% else %}
+<button type="{{ type }}" {{ attributes.defaults({class: classes}) }}{% if loadingLabel %} data-turbo-submits-with="{{ loadingLabel }}"{% endif %}>
+{% endif %}
+    {%- if icon and iconPosition == 'start' %}{{ ux_icon(icon, {class: iconClass, 'aria-hidden': 'true'}) }}{% endif -%}
+    {% block content %}{% endblock %}
+    {%- if icon and iconPosition == 'end' %}{{ ux_icon(icon, {class: iconClass, 'aria-hidden': 'true'}) }}{% endif -%}
+{% if href %}</a>{% else %}</button>{% endif %}

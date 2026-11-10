@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projets · GestionProjet{% endblock %}
+
+{% block body %}
+    {# projects is a pagination object: |length = projects on this page, totalItems = all active projects #}
+    <twig:PageHeader title="Projets" :subtitle="projects.totalItems ~ (projects.totalItems > 1 ? ' projets actifs' : ' projet actif')" />
+
+    {% if projects is empty %}
+        <twig:EmptyState message="Aucun projet pour l'instant." icon="lucide:folder-open" />
+    {% else %}
+        <div class="mb-4 flex flex-wrap items-center gap-2">
+            <twig:Button variant="secondary" size="sm" icon="lucide:funnel">Filtrer</twig:Button>
+            <twig:Button variant="secondary" size="sm" icon="lucide:arrow-up-down">Trier</twig:Button>
+            <twig:Button variant="secondary" size="sm" icon="lucide:layers">Grouper</twig:Button>
+            <twig:Button variant="ghost" size="sm" icon="lucide:plus">Ajouter une colonne</twig:Button>
+        </div>
+
+        <twig:Card :padded="false" class="overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                        <tr class="text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
+                            <th scope="col" class="px-4 py-3">Projet</th>
+                            <th scope="col" class="px-4 py-3">Client</th>
+                            <th scope="col" class="px-4 py-3">Priorité</th>
+                            <th scope="col" class="px-4 py-3">Statut</th>
+                            <th scope="col" class="px-4 py-3">Échéance</th>
+                            <th scope="col" class="px-4 py-3">Mis à jour</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 bg-white">
+                        {% for project in projects %}
+                            <tr class="align-top transition-colors hover:bg-gray-50">
+                                <td class="max-w-sm px-4 py-3">
+                                    <p class="font-medium text-gray-900">{{ project.name }}</p>
+                                    {% if project.description %}
+                                        <p class="mt-0.5 truncate text-gray-500">{{ project.description }}</p>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <p class="text-gray-700">{{ project.client.fullName }}</p>
+                                    {% if project.client.company %}
+                                        <p class="text-xs text-gray-500">{{ project.client.company }}</p>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3"><twig:PriorityBadge :priority="project.priority" /></td>
+                                <td class="px-4 py-3"><twig:StatusBadge :status="project.status" /></td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    {% if project.dueDate %}
+                                        <span class="inline-flex items-center gap-1.5 {{ project.overdue ? 'font-medium text-red-600' : 'text-gray-700' }}">
+                                            {{ ux_icon(project.overdue ? 'lucide:circle-alert' : 'lucide:calendar', {class: 'size-3.5', 'aria-hidden': 'true'}) }}
+                                            {{ project.dueDate|date('d/m/Y') }}
+                                            {% if project.overdue %}<span class="sr-only">(en retard)</span>{% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-gray-400">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-500">{{ project.updatedAt|date('d/m/Y') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </twig:Card>
+
+        {{ ux_pagination(projects) }}
+    {% endif %}
+{% endblock %}

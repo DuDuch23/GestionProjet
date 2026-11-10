@@ -1,0 +1,13 @@
+{#
+    <twig:PriorityBadge :priority="project.priority" />
+#}
+{% props priority %}
+
+{% set colors = {
+    low: 'gray',
+    medium: 'blue',
+    high: 'orange',
+    critical: 'red',
+} %}
+
+<twig:Badge :color="colors[priority.value] ?? 'gray'" dot {{ ...attributes }}>{{ priority.label() }}</twig:Badge>

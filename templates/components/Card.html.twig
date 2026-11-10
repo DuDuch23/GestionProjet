@@ -1,0 +1,25 @@
+{#
+    White bordered container.
+
+    <twig:Card title="Informations">…</twig:Card>
+    <twig:Card :padded="false" class="overflow-hidden">…table…</twig:Card>
+    <twig:Card href="{{ path('project') }}">…clickable card…</twig:Card>
+
+    Optional named block "actions" is rendered on the right of the title.
+#}
+{% props title = null, padded = true, href = null %}
+
+{% set classes = 'block rounded-xl border border-gray-200 bg-white'
+    ~ (href ? ' transition-all hover:border-gray-400 hover:shadow-sm') %}
+
+{% if href %}<a href="{{ href }}" {{ attributes.defaults({class: classes}) }}>{% else %}<div {{ attributes.defaults({class: classes}) }}>{% endif %}
+    {% if title %}
+        <div class="flex items-center justify-between gap-4 border-b border-gray-200 px-4 py-3">
+            <h2 class="text-lg font-semibold text-gray-900">{{ title }}</h2>
+            <div class="flex items-center gap-2">{% block actions %}{% endblock %}</div>
+        </div>
+    {% endif %}
+    <div class="{{ padded ? 'p-4' }}">
+        {% block content %}{% endblock %}
+    </div>
+{% if href %}</a>{% else %}</div>{% endif %}

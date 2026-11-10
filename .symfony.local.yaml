@@ -1,0 +1,5 @@
+# Symfony CLI: `symfony serve` also runs these processes.
+workers:
+    # Rebuilds assets/styles/app.css whenever a template or the CSS changes
+    tailwind:
+        cmd: ['symfony', 'console', 'tailwind:build', '--watch']

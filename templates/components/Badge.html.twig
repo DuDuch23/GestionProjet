@@ -1,0 +1,32 @@
+{#
+    Small rounded label.
+
+    <twig:Badge color="green" dot>Terminé</twig:Badge>
+
+    color: gray | blue | green | amber | orange | red | purple
+#}
+{% props color = 'gray', dot = false %}
+
+{% set colors = {
+    gray: 'bg-gray-100 text-gray-700 ring-gray-200',
+    blue: 'bg-blue-50 text-blue-700 ring-blue-200',
+    green: 'bg-green-50 text-green-700 ring-green-200',
+    amber: 'bg-amber-50 text-amber-800 ring-amber-200',
+    orange: 'bg-orange-50 text-orange-700 ring-orange-200',
+    red: 'bg-red-50 text-red-700 ring-red-200',
+    purple: 'bg-purple-50 text-purple-700 ring-purple-200',
+} %}
+{% set dots = {
+    gray: 'bg-gray-400',
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    amber: 'bg-amber-500',
+    orange: 'bg-orange-500',
+    red: 'bg-red-500',
+    purple: 'bg-purple-500',
+} %}
+
+<span {{ attributes.defaults({class: 'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ring-1 ring-inset ' ~ (colors[color] ?? colors.gray)}) }}>
+    {%- if dot %}<span class="size-1.5 rounded-full {{ dots[color] ?? dots.gray }}" aria-hidden="true"></span>{% endif -%}
+    {% block content %}{% endblock %}
+</span>
