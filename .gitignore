@@ -22,4 +22,11 @@
 /.claude/
 /.claude-flow/
 /.vscode/
-.env
+
+# Environment files
+# .env, .env.dev, .env.test and .env.local.example ARE committed: defaults only, no secrets.
+# Real values and secrets go in the files below, which are never committed:
+#   .env.local          (all environments)
+#   .env.<env>.local    (e.g. .env.test.local)
+# (/.env.local, /.env.local.php and /.env.*.local are already ignored by the Symfony block above.)
+# Production secrets: environment variables or the Symfony secrets vault (bin/console secrets:set).

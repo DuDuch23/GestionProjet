@@ -2,14 +2,11 @@
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-final class StyleguideControllerTest extends WebTestCase
+final class StyleguideControllerTest extends AuthenticatedWebTestCase
 {
     public function testRendersEveryComponentAndTheFormTheme(): void
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/styleguide');
+        $crawler = $this->browser->request('GET', '/styleguide');
 
         self::assertResponseIsSuccessful();
         self::assertSelectorCount(1, 'h1');

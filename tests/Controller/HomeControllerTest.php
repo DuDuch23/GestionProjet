@@ -2,18 +2,16 @@
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-final class HomeControllerTest extends WebTestCase
+final class HomeControllerTest extends AuthenticatedWebTestCase
 {
     public function testIndex(): void
     {
-        $client = static::createClient();
-        $client->request('GET', '/');
+        $this->browser->request('GET', '/');
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Bienvenue sur GestionProjet');
-        self::assertSelectorExists('a[aria-current="page"][href="/"]');
-        self::assertSelectorExists('a[href="/project"]');
+        self::assertSelectorExists('#sidebar a[aria-current="page"][href="/"]');
+        self::assertSelectorExists('#sidebar a[href="/project"]');
+        self::assertSelectorExists('#sidebar a[href="/client"]');
     }
 }

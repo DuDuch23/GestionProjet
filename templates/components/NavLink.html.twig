@@ -1,19 +1,20 @@
 {#
-    Navigation link, highlighted when the current route matches
+    Sidebar navigation item, highlighted when the current route matches
     (exactly, or as a prefix: "project" is active on "project_show").
 
-    <twig:NavLink route="project">Projets</twig:NavLink>
-    <twig:NavLink route="project" mobile>Projets</twig:NavLink>
+    <twig:NavLink route="project" icon="lucide:folder-kanban">Projets</twig:NavLink>
 #}
-{% props route, mobile = false %}
+{% props route, icon = null %}
 
 {% set current = app.current_route ?? '' %}
 {% set active = current == route or current starts with route ~ '_' %}
 
-{% set classes = (mobile ? 'block rounded-lg px-3 py-2 text-base' : 'rounded-lg px-3 py-2 text-sm')
-    ~ ' font-medium transition-colors '
-    ~ (active ? 'bg-gray-100 text-gray-900 underline decoration-2 underline-offset-4' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900') %}
+{% set classes = 'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors '
+    ~ (active ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900') %}
 
 <a href="{{ path(route) }}" {{ attributes.defaults({class: classes}) }}{% if active %} aria-current="page"{% endif %}>
-    {%- block content %}{% endblock -%}
+    {%- if icon -%}
+        {{ ux_icon(icon, {class: 'size-4 shrink-0 ' ~ (active ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'), 'aria-hidden': 'true'}) }}
+    {%- endif -%}
+    <span>{% block content %}{% endblock %}</span>
 </a>

@@ -20,16 +20,33 @@ security:
             lazy: true
             provider: app_user_provider
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
+            # Email + password form (SecurityController::login)
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                default_target_path: home
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            # POST form only (see base.html.twig): a GET link could be prefetched by Turbo and log the user out
+            logout:
+                path: app_logout
+                target: app_login
+                enable_csrf: true
+
+            # "Se souvenir de moi" checkbox: stays logged in for 7 days
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+
+            # Blocks brute force: 5 failed attempts per minute (per email + IP)
+            login_throttling:
+                max_attempts: 5
+                interval: '1 minute'
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:

@@ -4,29 +4,9 @@ namespace App\Tests\Controller;
 
 use App\Entity\Client;
 use App\Entity\Project;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class ClientControllerTest extends WebTestCase
+final class ClientControllerTest extends AuthenticatedWebTestCase
 {
-    private KernelBrowser $browser;
-    private EntityManagerInterface $em;
-
-    protected function setUp(): void
-    {
-        $this->browser = static::createClient();
-        $this->browser->disableReboot(); // same DB connection for every request, so the transaction is visible
-        $this->em = static::getContainer()->get(EntityManagerInterface::class);
-        $this->em->getConnection()->beginTransaction();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->em->getConnection()->rollBack();
-        parent::tearDown();
-    }
-
     public function testShowsEmptyStateWithoutClients(): void
     {
         $this->browser->request('GET', '/client');

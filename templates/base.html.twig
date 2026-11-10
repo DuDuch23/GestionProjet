@@ -19,53 +19,97 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
-    <body class="flex min-h-full flex-col">
-        <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/90 backdrop-blur" data-controller="mobile-menu">
-            <div class="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between gap-6 px-6">
-                <a href="{{ path('home') }}" class="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                    <span class="grid size-8 place-items-center rounded-lg bg-gray-900 text-white">
-                        {{ ux_icon('lucide:folder-kanban', {class: 'size-4', 'aria-hidden': 'true'}) }}
-                    </span>
-                    GestionProjet
-                </a>
+    <body class="h-full" data-controller="sidebar">
+        {# Pages without navigation (e.g. login) override this block #}
+        {% block layout %}
+            {# ── Mobile top bar (< md) ─────────────────────────────── #}
+            <div class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-gray-200 bg-white/90 px-4 backdrop-blur md:hidden">
+                <button type="button"
+                        class="-ml-2 grid size-10 place-items-center rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        aria-controls="sidebar" aria-expanded="false" aria-label="Ouvrir le menu"
+                        data-action="sidebar#open" data-sidebar-target="toggle">
+                    {{ ux_icon('lucide:menu', {class: 'size-5', 'aria-hidden': 'true'}) }}
+                </button>
+                <a href="{{ path('home') }}" class="text-sm font-semibold text-gray-900">GestionProjet</a>
+            </div>
 
-                <nav class="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
-                    <twig:NavLink route="home">Accueil</twig:NavLink>
-                    <twig:NavLink route="project">Projets</twig:NavLink>
-                    <twig:NavLink route="client" mobile>Clients</twig:NavLink>
+            {# ── Backdrop behind the mobile drawer ─────────────────── #}
+            <div class="fixed inset-0 z-40 hidden bg-gray-900/40 md:hidden" data-sidebar-target="backdrop" data-action="click->sidebar#close"></div>
+
+            {# ── Sidebar: fixed on md+, slide-in drawer below ──────── #}
+            <aside id="sidebar"
+                   class="invisible fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col border-r border-gray-200 bg-white transition-[translate,visibility] duration-200 md:visible md:translate-x-0"
+                   data-sidebar-target="panel">
+                <div class="flex h-16 shrink-0 items-center justify-between gap-2 px-5">
+                    <a href="{{ path('home') }}" class="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                        <span class="grid size-8 place-items-center rounded-lg bg-gray-900 text-white">
+                            {{ ux_icon('lucide:folder-kanban', {class: 'size-4', 'aria-hidden': 'true'}) }}
+                        </span>
+                        GestionProjet
+                    </a>
+                    <button type="button" class="-mr-2 grid size-9 place-items-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 md:hidden"
+                            aria-label="Fermer le menu" data-action="sidebar#close">
+                        {{ ux_icon('lucide:x', {class: 'size-5', 'aria-hidden': 'true'}) }}
+                    </button>
+                </div>
+
+                <nav class="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4" aria-label="Navigation principale">
+                    <twig:NavLink route="home" icon="lucide:house">Accueil</twig:NavLink>
+                    <twig:NavLink route="project" icon="lucide:folder-kanban">Projets</twig:NavLink>
+                    <twig:NavLink route="client" icon="lucide:users">Clients</twig:NavLink>
+
+                    {% if app.environment == 'dev' %}
+                        <p class="mt-6 mb-1 px-3 text-xs font-medium tracking-wide text-gray-400 uppercase">Développement</p>
+                        <twig:NavLink route="styleguide" icon="lucide:palette">Styleguide</twig:NavLink>
+                    {% endif %}
                 </nav>
 
-                <button type="button"
-                        class="-mr-2 grid size-10 place-items-center rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 md:hidden"
-                        aria-controls="mobile-nav" aria-expanded="false" aria-label="Ouvrir le menu"
-                        data-action="mobile-menu#toggle" data-mobile-menu-target="button">
-                    <span data-mobile-menu-target="openIcon">{{ ux_icon('lucide:menu', {class: 'size-5', 'aria-hidden': 'true'}) }}</span>
-                    <span class="hidden" data-mobile-menu-target="closeIcon">{{ ux_icon('lucide:x', {class: 'size-5', 'aria-hidden': 'true'}) }}</span>
-                </button>
+                {% if app.user %}
+                    <div class="shrink-0 border-t border-gray-200 p-3">
+                        <div class="flex items-center gap-3 px-2 py-2">
+                            <span class="grid size-8 shrink-0 place-items-center rounded-full bg-gray-100 text-sm font-semibold text-gray-700 uppercase" aria-hidden="true">
+                                {{ app.user.userIdentifier|first }}
+                            </span>
+                            <div class="min-w-0">
+                                <p class="truncate text-sm font-medium text-gray-900" title="{{ app.user.userIdentifier }}">{{ app.user.userIdentifier }}</p>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <p class="text-xs font-medium text-red-600">Administrateur</p>
+                                {% else %}
+                                    <p class="text-xs text-gray-500">Membre</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {# POST, not a link: Turbo prefetches links on hover, which would log the user out #}
+                        <form method="post" action="{{ path('app_logout') }}">
+                            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('logout') }}">
+                            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-red-600">
+                                {{ ux_icon('lucide:log-out', {class: 'size-4', 'aria-hidden': 'true'}) }}
+                                Déconnexion
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </aside>
+
+            {# ── Page content, shifted right of the sidebar on md+ ─── #}
+            <div class="flex min-h-full flex-col md:pl-64">
+                <main class="mx-auto w-full max-w-[1280px] flex-1 px-6 py-12">
+                    {% set flash_types = {success: 'success', error: 'error', danger: 'error', warning: 'warning', info: 'info', notice: 'info'} %}
+                    {% for type, messages in app.flashes %}
+                        {% for message in messages %}
+                            <twig:Alert :type="flash_types[type] ?? 'info'" class="mb-6">{{ message }}</twig:Alert>
+                        {% endfor %}
+                    {% endfor %}
+
+                    {% block body %}{% endblock %}
+                </main>
+
+                <footer class="border-t border-gray-200 bg-white">
+                    <div class="mx-auto w-full max-w-[1280px] px-6 py-6 text-xs text-gray-500">
+                        GestionProjet · {{ 'now'|date('Y') }}
+                    </div>
+                </footer>
             </div>
-
-            <nav id="mobile-nav" class="hidden border-t border-gray-200 px-4 py-3 md:hidden" aria-label="Navigation mobile" data-mobile-menu-target="menu">
-                <twig:NavLink route="home" mobile>Accueil</twig:NavLink>
-                <twig:NavLink route="project" mobile>Projets</twig:NavLink>
-                <twig:NavLink route="client" mobile>Clients</twig:NavLink>
-            </nav>
-        </header>
-
-        <main class="mx-auto w-full max-w-[1280px] flex-1 px-6 py-12">
-            {% set flash_types = {success: 'success', error: 'error', danger: 'error', warning: 'warning', info: 'info', notice: 'info'} %}
-            {% for type, messages in app.flashes %}
-                {% for message in messages %}
-                    <twig:Alert :type="flash_types[type] ?? 'info'" class="mb-6">{{ message }}</twig:Alert>
-                {% endfor %}
-            {% endfor %}
-
-            {% block body %}{% endblock %}
-        </main>
-
-        <footer class="border-t border-gray-200 bg-white">
-            <div class="mx-auto w-full max-w-[1280px] px-6 py-6 text-xs text-gray-500">
-                GestionProjet · {{ 'now'|date('Y') }}
-            </div>
-        </footer>
+        {% endblock %}
     </body>
 </html>

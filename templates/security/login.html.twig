@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion · GestionProjet{% endblock %}
+
+{# No sidebar on this page: centered card instead #}
+{% block layout %}
+    <main class="flex min-h-full items-center justify-center px-4 py-12">
+        <div class="w-full max-w-sm">
+            <div class="mb-8 flex flex-col items-center gap-3 text-center">
+                <span class="grid size-12 place-items-center rounded-xl bg-gray-900 text-white">
+                    {{ ux_icon('lucide:folder-kanban', {class: 'size-6', 'aria-hidden': 'true'}) }}
+                </span>
+                <h1 class="text-2xl font-bold tracking-tight text-gray-900">Connexion</h1>
+                <p class="text-sm text-gray-500">Accédez à vos projets et à vos clients.</p>
+            </div>
+
+            <twig:Card class="p-2">
+                <form method="post" action="{{ path('app_login') }}" class="flex flex-col gap-5">
+                    {% if error %}
+                        <twig:Alert type="error">{{ error.messageKey|trans(error.messageData, 'security') }}</twig:Alert>
+                    {% endif %}
+
+                    <div class="flex flex-col gap-1.5">
+                        <label for="username" class="text-sm font-medium text-gray-700">
+                            Adresse email<span class="ml-0.5 text-red-600" aria-hidden="true">*</span>
+                        </label>
+                        <input type="email" id="username" name="_username" value="{{ last_username }}"
+                               autocomplete="email" required autofocus
+                               class="w-full rounded-lg border {{ error ? 'border-red-500' : 'border-gray-300' }} bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-800 focus:outline-none"
+                               placeholder="vous@exemple.fr">
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label for="password" class="text-sm font-medium text-gray-700">
+                            Mot de passe<span class="ml-0.5 text-red-600" aria-hidden="true">*</span>
+                        </label>
+                        <input type="password" id="password" name="_password"
+                               autocomplete="current-password" required
+                               class="w-full rounded-lg border {{ error ? 'border-red-500' : 'border-gray-300' }} bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-gray-800 focus:outline-none">
+                    </div>
+
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="_remember_me" class="size-4 rounded border-gray-300 accent-gray-900">
+                        Se souvenir de moi
+                    </label>
+
+                    {# Stateless CSRF (config/packages/csrf.yaml + assets/controllers/csrf_protection_controller.js) #}
+                    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+                    <twig:Button type="submit" class="w-full" loadingLabel="Connexion…">Se connecter</twig:Button>
+                </form>
+            </twig:Card>
+
+            {% if app.environment == 'dev' %}
+                <p class="mt-6 text-center text-xs text-gray-500">
+                    Dev : <code class="rounded bg-gray-100 px-1">admin@gestionprojet.test</code> / <code class="rounded bg-gray-100 px-1">password</code>
+                    (fixtures)
+                </p>
+            {% endif %}
+        </div>
+    </main>
+{% endblock %}
